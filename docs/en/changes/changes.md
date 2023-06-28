@@ -32,6 +32,10 @@
 
 * Fix metric name `browser_app_error_rate` in `Browser-Root` dashboard.
 * Fix display name of `endpoint_cpm` for endpoint list in `General-Service` dashboard.
+* Calculate string width to set Tabs name width.
+* Add a link to explain the expression metric, add units in the continue profiling widget.
+* Fix the title of instance list and notices in the continue profiling.
+* Add scss variables.
 
 #### Documentation
 
