@@ -69,9 +69,9 @@ public class BanyanDBStorageClient implements Client, HealthCheckable {
 
     public BanyanDBStorageClient(BanyanDBStorageConfig config) {
         Options options = new Options();
-        options.setSslTrustCAPath(config.getSslTrustCAPath());
+        options.setSslTrustCAPath(config.getGlobal().getSslTrustCAPath());
         this.client = new BanyanDBClient(config.getTargetArray(), options);
-        this.flushTimeout = config.getFlushTimeout();
+        this.flushTimeout = config.getGlobal().getFlushTimeout();
     }
 
     @Override
@@ -128,7 +128,7 @@ public class BanyanDBStorageClient implements Client, HealthCheckable {
             BanyandbProperty.QueryResponse resp
                 = this.client.query(BanyandbProperty.QueryRequest.newBuilder()
                                                                  .addGroups(group)
-                                                                 .setContainer(name)
+                                                                 .setName(name)
                                                                  .setLimit(Integer.MAX_VALUE)
                                                                  .build());
             this.healthChecker.health();
@@ -148,7 +148,7 @@ public class BanyanDBStorageClient implements Client, HealthCheckable {
         try {
             BanyandbProperty.QueryResponse resp = this.client.query(BanyandbProperty.QueryRequest.newBuilder()
                                                                                                  .addGroups(group)
-                                                                                                 .setContainer(name)
+                                                                                                 .setName(name)
                                                                                                  .addIds(id)
                                                                                                  .build());
             this.healthChecker.health();
@@ -211,10 +211,21 @@ public class BanyanDBStorageClient implements Client, HealthCheckable {
         }
     }
 
+    public BanyandbProperty.QueryResponse query(BanyandbProperty.QueryRequest request) throws IOException {
+        try {
+            BanyandbProperty.QueryResponse response = this.client.query(request);
+            this.healthChecker.health();
+            return response;
+        } catch (BanyanDBException ex) {
+            healthChecker.unHealth(ex);
+            throw new IOException("fail to query property", ex);
+        }
+    }
+
     /**
      * PropertyStore.Strategy is default to {@link Strategy#STRATEGY_MERGE}
      */
-    public void define(Property property) throws IOException {
+    public void apply(Property property) throws IOException {
         try {
             this.client.apply(property);
             this.healthChecker.health();
@@ -224,7 +235,7 @@ public class BanyanDBStorageClient implements Client, HealthCheckable {
         }
     }
 
-    public void define(Property property, Strategy strategy) throws IOException {
+    public void apply(Property property, Strategy strategy) throws IOException {
         try {
             this.client.apply(property, strategy);
             this.healthChecker.health();
