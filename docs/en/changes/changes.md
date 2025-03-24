@@ -104,6 +104,9 @@
 * Fix repetitive names in router.
 * Bump up dependencies.
 * Fixes tooltips cannot completely display metrics information.
+* Fixes time range when generate link.
+* Add topN selector for endpoint list.
+* Add skywalking go agent self observability menu.
 
 #### Documentation
 * Update release document to adopt newly added revision-based process.
